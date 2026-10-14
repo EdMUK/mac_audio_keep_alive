@@ -37,9 +37,10 @@ Requires macOS 15 or later. Building needs Xcode 16 or later and [XcodeGen](http
 make run       # generate the project, build Debug, launch
 make test      # unit tests (schedule, profiles, tone generator)
 make release   # build Release into build/DerivedData/Build/Products/Release/
+make install   # build Release, copy to /Applications and launch it
 ```
 
-Copy `SpeakerKeepAlive.app` to `/Applications` and turn on **Launch at login** in Settings. The build is ad-hoc signed for local use. If you download a build someone else made, you may need to right-click › Open the first time.
+Run the app from `/Applications` (`make install`), not from the build folder. If the build folder is on an external drive that disconnects, for example when the Mac sleeps, the running app crashes. Then turn on **Launch at login** in Settings. The build is ad-hoc signed for local use. If you download a build someone else made, you may need to right-click › Open the first time.
 
 On first launch the app picks an output whose name looks digital ("SPDIF", "Optical"…). You can change it in **Settings › General**.
 
