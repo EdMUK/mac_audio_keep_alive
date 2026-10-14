@@ -1,0 +1,20 @@
+{
+  "connection" : "optical",
+  "id" : "majority-d70x",
+  "keepStreamOpen" : true,
+  "manufacturer" : "Majority",
+  "model" : "D70X",
+  "name" : "Majority D70X",
+  "notes" : "Goes to standby after up to 19 minutes without a signal (EU ErP rules), and treats a very quiet source as no signal, so digital silence alone doesn't keep it awake. An 18 Hz burst is well below the bass a bookshelf speaker can reproduce. If the speakers still sleep, raise the level a few dB at a time, or try 30–40 Hz.",
+  "schemaVersion" : 1,
+  "sourceURL" : "https://www.richersounds.com/content/product_files/D70X_Active_User_Manual_Collection_NOV_2025.pdf",
+  "standbyTimeoutMinutes" : 19,
+  "tested" : false,
+  "tone" : {
+    "burstSeconds" : 3,
+    "fadeMilliseconds" : 50,
+    "frequencyHz" : 18,
+    "intervalSeconds" : 300,
+    "levelDBFS" : -50
+  }
+}

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: How Speaker Keep-Alive works
+    url: https://edmuk.github.io/mac_audio_keep_alive/
+    about: Background on why speakers sleep, and how to tune a profile.

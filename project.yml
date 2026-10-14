@@ -1,0 +1,67 @@
+name: SpeakerKeepAlive
+options:
+  bundleIdPrefix: io.github.edmuk
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: NO
+targets:
+  KeepAliveCore:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/KeepAliveCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.edmuk.KeepAliveCore
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+
+  SpeakerKeepAlive:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/SpeakerKeepAlive
+      - path: Profiles
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - target: KeepAliveCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.edmuk.SpeakerKeepAlive
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Speaker Keep-Alive
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 Ed Morley. MIT License."
+
+  KeepAliveCoreTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests/KeepAliveCoreTests
+    dependencies:
+      - target: KeepAliveCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.edmuk.KeepAliveCoreTests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  SpeakerKeepAlive:
+    build:
+      targets:
+        SpeakerKeepAlive: all
+        KeepAliveCoreTests: [test]
+    test:
+      targets:
+        - KeepAliveCoreTests

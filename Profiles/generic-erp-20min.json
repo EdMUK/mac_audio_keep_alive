@@ -1,0 +1,20 @@
+{
+  "connection" : "other",
+  "id" : "generic-erp-20min",
+  "keepStreamOpen" : true,
+  "manufacturer" : "",
+  "model" : "",
+  "name" : "Generic (EU 20-minute auto-standby)",
+  "notes" : "A starting point for any speaker that sleeps after about 20 minutes without a signal, as EU Regulation 2023/826 requires. Uses a 40 Hz tone a little louder than the D70X profile so more speakers detect it. Duplicate it and lower the level until it's inaudible but the speaker still stays awake.",
+  "schemaVersion" : 1,
+  "sourceURL" : "https://eur-lex.europa.eu/eli/reg/2023/826/oj",
+  "standbyTimeoutMinutes" : 20,
+  "tested" : false,
+  "tone" : {
+    "burstSeconds" : 3,
+    "fadeMilliseconds" : 50,
+    "frequencyHz" : 40,
+    "intervalSeconds" : 300,
+    "levelDBFS" : -45
+  }
+}

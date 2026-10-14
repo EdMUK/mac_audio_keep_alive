@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Speaker Keep-Alive</title>
+  <meta name="description" content="A macOS menu bar app that stops powered speakers falling into standby when your Mac goes quiet.">
+  <style>
+    :root {
+      --bg: #fbfaf8;
+      --fg: #1d1d1f;
+      --muted: #5f5f66;
+      --line: #e3e1dc;
+      --card: #ffffff;
+      --accent: #2f6fde;
+      --code-bg: #f1efea;
+      color-scheme: light dark;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #151517;
+        --fg: #ececf0;
+        --muted: #a0a0aa;
+        --line: #2c2c31;
+        --card: #1d1d21;
+        --accent: #7aa7ff;
+        --code-bg: #232328;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    }
+    main { max-width: 760px; margin: 0 auto; padding: 56px 16px 80px; }
+    header p.lede { font-size: 1.2rem; color: var(--muted); margin-top: 0; }
+    h1 { font-size: 2.4rem; line-height: 1.15; margin: 0 0 12px; letter-spacing: -0.02em; }
+    h2 { font-size: 1.35rem; margin: 48px 0 8px; letter-spacing: -0.01em; }
+    a { color: var(--accent); }
+    blockquote {
+      margin: 16px 0;
+      padding: 12px 16px;
+      border-left: 3px solid var(--accent);
+      background: var(--card);
+      color: var(--muted);
+    }
+    code, pre { font: 0.88em/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+    pre { background: var(--code-bg); padding: 14px 16px; border-radius: 8px; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    .buttons { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 0; }
+    .button {
+      display: inline-block;
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--fg);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    ol li, ul li { margin: 4px 0; }
+    footer { margin-top: 64px; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); padding-top: 16px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Speaker Keep-Alive</h1>
+    <p class="lede">A small macOS menu bar app that stops powered speakers falling into standby whenever your Mac goes quiet.</p>
+    <div class="buttons">
+      <a class="button primary" href="https://github.com/EdMUK/mac_audio_keep_alive">Source on GitHub</a>
+      <a class="button" href="https://github.com/EdMUK/mac_audio_keep_alive/issues/new?template=speaker-profile.yml">Share a speaker profile</a>
+    </div>
+  </header>
+
+  <h2>Why do my speakers keep switching off?</h2>
+  <p>Since May 2025, EU <a href="https://eur-lex.europa.eu/eli/reg/2023/826/oj">Regulation 2023/826</a> has required household electronics, speakers included, to drop into a low-power mode after no more than 20 minutes without use. Powered speakers decide they're unused by watching the <strong>level</strong> of the signal coming in. The Majority D70X manual puts it plainly:</p>
+  <blockquote>If there is no activity/signal received from a connected device for up to 19 minutes, then the speakers will automatically switch to Standby Mode… If the volume level of the audio source … is set to minimum, the D70X might recognise this as ‘No Audio Signal’.</blockquote>
+  <p>That's why "keep the port open" tricks that send pure digital silence don't work: the link is up, but the speaker hears nothing. It needs a real signal, just not one you can hear.</p>
+
+  <h2>How it works</h2>
+  <ul>
+    <li>Every few minutes it plays a few seconds of a very low tone (18 Hz at -50 dBFS for the D70X). Bookshelf speakers can barely reproduce it, but their signal detector still registers it.</li>
+    <li>The tone goes to the output device you pick, such as a USB optical adapter, whatever the system default output is.</li>
+    <li>It runs always, on a per-weekday schedule, or not at all. You can override this from the menu.</li>
+    <li>It picks up again after the adapter is unplugged and plugged back in, and after sleep and wake.</li>
+  </ul>
+  <p>While active, macOS treats the Mac as playing audio and won't idle-sleep it. A schedule lets the Mac and the speakers sleep overnight.</p>
+
+  <h2>Speaker profiles</h2>
+  <p>Each speaker needs slightly different settings, so they're stored as profiles. The app ships with these:</p>
+  <table>
+    <thead><tr><th>Profile</th><th>Tone</th><th>Standby after</th></tr></thead>
+    <tbody>
+      <tr><td>Majority D70X (optical)</td><td>18 Hz, -50 dBFS, 3 s every 5 min</td><td>19 min</td></tr>
+      <tr><td>Generic (EU 20-minute auto-standby)</td><td>40 Hz, -45 dBFS, 3 s every 5 min</td><td>20 min</td></tr>
+    </tbody>
+  </table>
+  <p>To tune one for your speakers, duplicate the closest profile in <em>Settings › Profiles</em>. Use <em>Test Tone</em> to check you can't hear it, then leave the Mac idle for half an hour to check the speakers stay on. If they still sleep, raise the level a few dB, or try 30–40 Hz.</p>
+
+  <h2>Share a profile</h2>
+  <p>Got one that works? Choose <em>Share › Submit on GitHub…</em> in the app. It opens a pre-filled issue with your profile's JSON. Tested profiles are added to the app so the next person with the same speakers doesn't have to experiment.</p>
+
+  <h2>Build it</h2>
+  <p>Requires macOS 15 or later. To build you need Xcode and <a href="https://github.com/yonaskolb/XcodeGen">XcodeGen</a>.</p>
+  <pre><code>brew install xcodegen
+git clone https://github.com/EdMUK/mac_audio_keep_alive.git
+cd mac_audio_keep_alive
+make run</code></pre>
+  <p>Can't see the menu bar icon? Open the app again from Finder or Spotlight and Settings appears.</p>
+
+  <footer>MIT licensed · © 2026 Ed Morley · <a href="https://github.com/EdMUK/mac_audio_keep_alive">github.com/EdMUK/mac_audio_keep_alive</a></footer>
+</main>
+</body>
+</html>

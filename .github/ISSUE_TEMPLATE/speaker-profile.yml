@@ -1,0 +1,68 @@
+name: Speaker profile
+description: Share a profile that keeps a speaker awake, so it can be built into the app.
+title: "[Profile] "
+labels: ["speaker-profile"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing a profile! In the app, choose **Settings › Profiles › Share › Submit on GitHub…** to fill this in automatically, or use **Copy JSON** and paste it below.
+  - type: input
+    id: speaker
+    attributes:
+      label: Speaker
+      description: Manufacturer and model.
+      placeholder: Majority D70X
+    validations:
+      required: true
+  - type: dropdown
+    id: connection
+    attributes:
+      label: Connection to the Mac
+      options:
+        - Optical (S/PDIF)
+        - USB
+        - HDMI
+        - Analogue
+        - Bluetooth
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: profile
+    attributes:
+      label: Profile JSON
+      description: Exported from the app.
+      render: json
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: Does it keep the speaker awake?
+      description: Leave the speaker idle with the app active for at least 30 minutes.
+      options:
+        - "Yes, reliably"
+        - "Mostly, but it sometimes still sleeps"
+        - "Not yet, I need help tuning it"
+    validations:
+      required: true
+  - type: dropdown
+    id: audible
+    attributes:
+      label: Can you hear the tone?
+      options:
+        - "No"
+        - "Only with my ear near the speaker"
+        - "Yes, faintly"
+        - "Yes, clearly"
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: "macOS 27.0"
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else?
+      description: Links to the manual, how you found the right level, other things you tried.
