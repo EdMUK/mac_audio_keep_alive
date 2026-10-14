@@ -57,6 +57,9 @@ final class Coordinator {
     }
 
     init() {
+        // Our tone shouldn't keep the Mac awake: if the Mac idle-sleeps, the
+        // speakers can sleep too.
+        KeepAliveEngine.allowIdleSleepDuringPlayback()
         settings = AppSettings.load()
         pickInitialDevice()
 
@@ -90,11 +93,10 @@ final class Coordinator {
 
     var menuBarSymbol: String {
         switch status {
-        case .active: "speaker.wave.2.fill"
-        case .outsideSchedule, .paused: "speaker.zzz"
-        case .off: "speaker"
-        case .deviceMissing: "speaker.slash"
-        case .error: "exclamationmark.triangle"
+        // Bookshelf speakers, so it isn't mistaken for the system volume icon.
+        case .active: "hifispeaker.2.fill"
+        case .outsideSchedule, .paused, .off: "hifispeaker.2"
+        case .deviceMissing, .error: "hifispeaker.badge.exclamationmark"
         }
     }
 
@@ -214,8 +216,7 @@ final class Coordinator {
         engine.stop()
     }
 
-    /// Opens the device just long enough for one burst, so the Mac can idle-sleep
-    /// between bursts.
+    /// Opens the device just long enough for one burst.
     private func playStandaloneBurst(deviceID: AudioDeviceID, tone: ToneSettings) async {
         do {
             try engine.start(deviceID: deviceID, tone: tone)

@@ -28,6 +28,19 @@ final class KeepAliveEngine {
 
     var isRunning: Bool { engine?.isRunning ?? false }
 
+    /// By default, any running audio output stops macOS idle-sleeping (coreaudiod
+    /// takes a PreventUserIdleSystemSleep assertion). This opts this process
+    /// out, so the keep-alive tone never keeps the Mac awake on its own.
+    static func allowIdleSleepDuringPlayback() {
+        var allowed: UInt32 = 1
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertySleepingIsAllowed,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        AudioObjectSetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, UInt32(MemoryLayout<UInt32>.size), &allowed)
+    }
+
     func start(deviceID: AudioDeviceID, tone: ToneSettings) throws {
         stop()
         let engine = AVAudioEngine()

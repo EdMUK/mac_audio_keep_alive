@@ -53,8 +53,7 @@ public struct SpeakerProfile: Codable, Hashable, Identifiable, Sendable {
     public var standbyTimeoutMinutes: Double
     public var tone: ToneSettings
     /// Keep the output stream running between bursts. This keeps digital links
-    /// locked (no clipped first syllable) but stops the Mac idle-sleeping
-    /// while active.
+    /// locked, so audio you play afterwards doesn't start clipped.
     public var keepStreamOpen: Bool
     public var notes: String
     public var sourceURL: String?

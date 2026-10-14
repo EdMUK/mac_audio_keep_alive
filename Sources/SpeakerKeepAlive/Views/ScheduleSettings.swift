@@ -13,7 +13,7 @@ struct ScheduleSettings: View {
                     Text("Off").tag(ScheduleMode.off)
                 }
                 .pickerStyle(.segmented)
-                Text("While active, macOS won't idle-sleep the Mac if the profile keeps the stream open. A schedule lets both the speakers and the Mac sleep overnight.")
+                Text("The tone never stops your Mac from sleeping. When the Mac sleeps, the speakers will go to standby too.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }

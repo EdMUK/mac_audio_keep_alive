@@ -29,13 +29,13 @@ struct MenuContent: View {
         if coordinator.override != nil {
             Button("Resume Schedule") { coordinator.clearOverride() }
         }
-        Button("Keep Awake for 1 Hour") { coordinator.keepAwake(for: 3600) }
-        Button("Keep Awake Until Midnight") { coordinator.keepAwakeUntilMidnight() }
+        Button("Keep Speakers Awake for 1 Hour") { coordinator.keepAwake(for: 3600) }
+        Button("Keep Speakers Awake Until Midnight") { coordinator.keepAwakeUntilMidnight() }
         Button("Pause for 1 Hour") { coordinator.pause(for: 3600) }
 
         Divider()
 
-        Button("Play Test Burst") { coordinator.playTestBurst() }
+        Button("Play Test Tone") { coordinator.playTestBurst() }
             .disabled(coordinator.targetDevice == nil)
         Button("Settings…") {
             openWindow(id: SettingsView.windowID)

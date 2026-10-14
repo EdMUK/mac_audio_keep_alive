@@ -23,11 +23,11 @@ The Mac side matters less. macOS doesn't power down USB or optical ports. When n
 ## What it does
 
 - Plays the tone to a **specific output device**, such as a USB optical adapter, whatever the system default output is.
-- Runs **always**, **on a schedule** (per-weekday windows, including windows that run past midnight), or **off**. Menu overrides: keep awake for an hour or until midnight, or pause for an hour.
+- Runs **always**, **on a schedule** (per-weekday windows, including windows that run past midnight), or **off**. Menu overrides: keep the speakers awake for an hour or until midnight, or pause for an hour.
 - Recovers when the device is unplugged and plugged back in, and after sleep and wake.
 - Comes with **built-in profiles** (`Profiles/*.json`). You can duplicate and tune them, create your own, import and export JSON, and **submit a profile on GitHub** from inside the app.
 
-> **Note:** while the tone stream is open, macOS holds a "prevent idle sleep" assertion, so the Mac won't sleep on its own during active hours (the display still sleeps). Use a schedule so the Mac can sleep overnight, or turn off **Keep stream open between bursts** in a custom profile.
+The tone never keeps your Mac awake. Normally any running audio output stops macOS idle-sleeping, but the app opts out of that (`kAudioHardwarePropertySleepingIsAllowed`). When the Mac sleeps, the speakers follow it into standby.
 
 ## Install and build
 
@@ -49,7 +49,7 @@ On first launch the app picks an output whose name looks digital ("SPDIF", "Opti
 
 1. In **Settings › Profiles**, duplicate the closest built-in profile.
 2. With your speaker volume at its usual setting, click **Test Tone**. You want to hear nothing, or almost nothing.
-3. Leave the Mac idle with the app active for 30+ minutes. Does the speaker stay on?
+3. Go 30+ minutes without playing any audio, with the app active and the Mac awake. Does the speaker stay on?
    - If it still sleeps, raise the **level** 3–5 dB at a time. If that's audible before it works, try 30–40 Hz, because some speakers filter out very low frequencies before the level detector.
    - If it stays awake, try lowering the level until it fails, then go back up 5 dB for a safety margin.
 4. Keep the **interval** comfortably below the speaker's standby timeout. The app won't save a profile where it isn't.

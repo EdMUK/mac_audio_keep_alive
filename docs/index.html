@@ -92,7 +92,7 @@
     <li>It runs always, on a per-weekday schedule, or not at all. You can override this from the menu.</li>
     <li>It picks up again after the adapter is unplugged and plugged back in, and after sleep and wake.</li>
   </ul>
-  <p>While active, macOS treats the Mac as playing audio and won't idle-sleep it. A schedule lets the Mac and the speakers sleep overnight.</p>
+  <p>The tone never keeps your Mac awake. Normally any audio output stops a Mac idle-sleeping, but the app opts out of that, so when the Mac goes to sleep the speakers follow it into standby.</p>
 
   <h2>Speaker profiles</h2>
   <p>Each speaker needs slightly different settings, so they're stored as profiles. The app ships with these:</p>
@@ -103,7 +103,7 @@
       <tr><td>Generic (EU 20-minute auto-standby)</td><td>40 Hz, -45 dBFS, 3 s every 5 min</td><td>20 min</td></tr>
     </tbody>
   </table>
-  <p>To tune one for your speakers, duplicate the closest profile in <em>Settings › Profiles</em>. Use <em>Test Tone</em> to check you can't hear it, then leave the Mac idle for half an hour to check the speakers stay on. If they still sleep, raise the level a few dB, or try 30–40 Hz.</p>
+  <p>To tune one for your speakers, duplicate the closest profile in <em>Settings › Profiles</em>. Use <em>Test Tone</em> to check you can't hear it, then go 30 minutes without playing anything (with the Mac still awake) to check the speakers stay on. If they still sleep, raise the level a few dB, or try 30–40 Hz.</p>
 
   <h2>Share a profile</h2>
   <p>Got one that works? Choose <em>Share › Submit on GitHub…</em> in the app. It opens a pre-filled issue with your profile's JSON. Tested profiles are added to the app so the next person with the same speakers doesn't have to experiment.</p>

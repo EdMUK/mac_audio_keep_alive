@@ -193,7 +193,7 @@ private struct ProfileEditor: View {
                     numberField("Every (s)", $draft.tone.intervalSeconds)
                     numberField("Fade (ms)", $draft.tone.fadeMilliseconds)
                     Toggle("Keep stream open between bursts", isOn: $draft.keepStreamOpen)
-                        .help("Keeps digital links locked so audio doesn't start clipped, but stops the Mac idle-sleeping while active.")
+                        .help("Keeps digital links locked, so audio you play afterwards doesn't start clipped.")
                 }
 
                 Section("About") {
