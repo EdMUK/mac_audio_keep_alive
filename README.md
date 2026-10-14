@@ -43,6 +43,8 @@ Copy `SpeakerKeepAlive.app` to `/Applications` and turn on **Launch at login** i
 
 On first launch the app picks an output whose name looks digital ("SPDIF", "Optical"…). You can change it in **Settings › General**.
 
+The menu bar icon is a pair of bookshelf speakers: **filled** while it's keeping the speakers awake, **outlined** outside active hours, when paused or when off, and a single speaker with a **warning badge** if the output device is missing or audio couldn't start.
+
 **Can't see the menu bar icon?** A crowded menu bar can hide it. Open the app again from Finder or Spotlight and Settings opens. In recent macOS versions you can also allow the icon under **System Settings › Menu Bar**.
 
 ## Tuning a profile
