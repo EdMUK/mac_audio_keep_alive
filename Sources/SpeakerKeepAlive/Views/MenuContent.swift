@@ -57,6 +57,7 @@ extension Coordinator {
         case .outsideSchedule: "Outside scheduled hours"
         case .off: "Off"
         case .paused: "Paused"
+        case .asleep: "Mac asleep, speakers can sleep too"
         case .deviceMissing(let name): "Waiting for \(name)"
         case .error(let message): "Problem: \(message)"
         }

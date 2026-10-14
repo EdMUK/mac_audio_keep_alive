@@ -16,6 +16,8 @@ final class Coordinator {
         case outsideSchedule
         case off
         case paused
+        /// The Mac is asleep (or just waking); the speakers are allowed to sleep too.
+        case asleep
         case deviceMissing(String)
         case error(String)
     }
@@ -95,7 +97,7 @@ final class Coordinator {
         switch status {
         // Bookshelf speakers, so it isn't mistaken for the system volume icon.
         case .active: "hifispeaker.2.fill"
-        case .outsideSchedule, .paused, .off: "hifispeaker.2"
+        case .outsideSchedule, .paused, .off, .asleep: "hifispeaker.2"
         case .deviceMissing, .error: "hifispeaker.badge.exclamationmark"
         }
     }
@@ -152,7 +154,9 @@ final class Coordinator {
 
         guard decision.isActive, !isAsleep else {
             stopKeepAlive()
-            if override != nil {
+            if isAsleep {
+                status = .asleep
+            } else if override != nil {
                 status = .paused
             } else {
                 status = settings.schedule.mode == .off ? .off : .outsideSchedule
