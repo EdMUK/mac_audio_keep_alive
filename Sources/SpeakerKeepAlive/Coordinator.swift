@@ -172,6 +172,11 @@ final class Coordinator {
         let config = RunningConfig(deviceID: device.id, profile: activeProfile)
         if config != running {
             startKeepAlive(config)
+        } else if config.profile.keepStreamOpen, !engine.isPlaying(on: device.id) {
+            // Belt and braces: the stream should never move or stop on its own,
+            // but if it does the speakers silently stop getting the tone.
+            log.error("Audio is no longer playing to device \(device.id); restarting")
+            startKeepAlive(config)
         }
     }
 
