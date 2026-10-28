@@ -25,8 +25,8 @@ final class KeepAliveEngine {
     }
 
     /// Called when the device changes under a running engine, e.g. its sample
-    /// rate changes or it stops working.
-    var onConfigurationChange: (() -> Void)?
+    /// rate changes or it stops working, with a description of what changed.
+    var onConfigurationChange: ((String) -> Void)?
 
     private var unit: AudioUnit?
     private var deviceID: AudioDeviceID?
@@ -163,8 +163,10 @@ final class KeepAliveEngine {
     ]
 
     private func listenForDeviceChanges(_ deviceID: AudioDeviceID) {
-        let block: AudioObjectPropertyListenerBlock = { [weak self] _, _ in
-            MainActor.assumeIsolated { self?.onConfigurationChange?() }
+        let block: AudioObjectPropertyListenerBlock = { [weak self] count, addresses in
+            let selectors = UnsafeBufferPointer(start: addresses, count: Int(count)).map(\.mSelector)
+            let reason = selectors.contains(kAudioDevicePropertyDeviceIsAlive) ? "device stopped responding" : "sample rate changed"
+            MainActor.assumeIsolated { self?.onConfigurationChange?(reason) }
         }
         for selector in Self.watchedProperties {
             var address = Self.address(selector)

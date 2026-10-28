@@ -25,6 +25,7 @@ The Mac side matters less. macOS doesn't power down USB or optical ports. When n
 - Plays the tone to a **specific output device**, such as a USB optical adapter, whatever the system default output is. It keeps going to the speakers when you switch to AirPods or headphones.
 - Runs **always**, **on a schedule** (per-weekday windows, including windows that run past midnight), or **off**. Menu overrides: keep the speakers awake for an hour or until midnight, or pause for an hour.
 - Recovers when the device is unplugged and plugged back in, and after sleep and wake.
+- Keeps an **event log** of status changes, audio devices (inputs included) disappearing and reappearing, the tone restarting, and sleep and wake. Open it with **Show Event Log** in the menu. It's at `~/Library/Logs/SpeakerKeepAlive/events.log`. If your speakers go off, note the time and check the log to see whether the link dropped then.
 - Comes with **built-in profiles** (`Profiles/*.json`). You can duplicate and tune them, create your own, import and export JSON, and **submit a profile on GitHub** from inside the app.
 
 The tone never keeps your Mac awake. Normally any running audio output stops macOS idle-sleeping, but the app opts out of that (`kAudioHardwarePropertySleepingIsAllowed`). When the Mac sleeps, the speakers follow it into standby.

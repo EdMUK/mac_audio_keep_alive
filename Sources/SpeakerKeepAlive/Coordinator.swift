@@ -2,9 +2,8 @@ import AppKit
 import CoreAudio
 import KeepAliveCore
 import Observation
-import os
 
-private let log = Logger(subsystem: "io.github.edmuk.SpeakerKeepAlive", category: "coordinator")
+private let events = EventLog.shared
 
 /// Decides when to keep the speakers awake (schedule, overrides, sleep, device
 /// presence) and drives the engine accordingly.
@@ -20,6 +19,18 @@ final class Coordinator {
         case asleep
         case deviceMissing(String)
         case error(String)
+
+        var logDescription: String {
+            switch self {
+            case .active: "keeping speakers awake"
+            case .outsideSchedule: "outside scheduled hours"
+            case .off: "off"
+            case .paused: "paused"
+            case .asleep: "Mac asleep"
+            case .deviceMissing(let name): "waiting for \(name)"
+            case .error(let message): "problem: \(message)"
+            }
+        }
     }
 
     let devices = AudioDeviceMonitor()
@@ -36,7 +47,7 @@ final class Coordinator {
     private(set) var override: ActivityOverride?
     private(set) var status: Status = .off {
         didSet {
-            if status != oldValue { log.info("Status: \(String(describing: self.status), privacy: .public)") }
+            if status != oldValue { events.record("Status: \(status.logDescription)") }
         }
     }
     private(set) var nextBurst: Date?
@@ -59,6 +70,7 @@ final class Coordinator {
     }
 
     init() {
+        events.record("Speaker Keep-Alive \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "") started")
         // Our tone shouldn't keep the Mac awake: if the Mac idle-sleeps, the
         // speakers can sleep too.
         KeepAliveEngine.allowIdleSleepDuringPlayback()
@@ -67,13 +79,20 @@ final class Coordinator {
 
         profiles.onChange = { [weak self] in self?.reevaluate() }
         devices.onChange = { [weak self] in self?.reevaluate() }
-        engine.onConfigurationChange = { [weak self] in self?.restartSoon() }
+        engine.onConfigurationChange = { [weak self] reason in
+            events.record("Audio device changed (\(reason)); restarting the tone")
+            self?.restartSoon()
+        }
         observeSystem()
 
         ticker = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.reevaluate() }
         }
         reevaluate()
+    }
+
+    func showEventLog() {
+        NSWorkspace.shared.open(EventLog.shared.fileURL)
     }
 
     // MARK: - Derived state
@@ -175,7 +194,7 @@ final class Coordinator {
         } else if config.profile.keepStreamOpen, !engine.isPlaying(on: device.id) {
             // Belt and braces: the stream should never move or stop on its own,
             // but if it does the speakers silently stop getting the tone.
-            log.error("Audio is no longer playing to device \(device.id); restarting")
+            events.record("Tone was no longer playing to \(device.name) (id \(device.id)); restarting it")
             startKeepAlive(config)
         }
     }
@@ -193,14 +212,14 @@ final class Coordinator {
                 try engine.start(deviceID: config.deviceID, tone: profile.tone)
             } catch {
                 // Leave `running` nil so the next tick retries.
-                log.error("Couldn't start audio on device \(config.deviceID): \(error.localizedDescription, privacy: .public)")
+                events.record("Couldn't start the tone on device \(config.deviceID): \(error.localizedDescription)")
                 status = .error(error.localizedDescription)
                 return
             }
         }
         running = config
         status = .active
-        log.info("Keeping awake: profile \(profile.id, privacy: .public), device \(config.deviceID), stream open \(profile.keepStreamOpen)")
+        events.record("Tone started: profile \(profile.id), device \(config.deviceID), \(profile.tone.frequencyHz.formatted()) Hz at \(profile.tone.levelDBFS.formatted()) dBFS, \(profile.tone.burstSeconds.formatted()) s every \(profile.tone.intervalSeconds.formatted()) s, stream open \(profile.keepStreamOpen)")
 
         let interval = profile.tone.intervalSeconds
         burstTask = Task { [weak self] in
@@ -276,12 +295,14 @@ final class Coordinator {
         let workspace = NSWorkspace.shared.notificationCenter
         workspace.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
+                events.record("Mac going to sleep")
                 self?.isAsleep = true
                 self?.reevaluate()
             }
         }
         workspace.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
+                events.record("Mac woke up")
                 // Give USB audio devices a moment to come back after wake.
                 _ = Task {
                     try? await Task.sleep(for: .seconds(3))

@@ -37,6 +37,7 @@ struct MenuContent: View {
 
         Button("Play Test Tone") { coordinator.playTestBurst() }
             .disabled(coordinator.targetDevice == nil)
+        Button("Show Event Log") { coordinator.showEventLog() }
         Button("Settings…") {
             openWindow(id: SettingsView.windowID)
             NSApp.activate()

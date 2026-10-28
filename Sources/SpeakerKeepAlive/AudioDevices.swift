@@ -17,6 +17,9 @@ final class AudioDeviceMonitor {
     /// Called after the device list changes.
     @ObservationIgnored var onChange: (() -> Void)?
     @ObservationIgnored private var listener: AudioObjectPropertyListenerBlock?
+    /// Every audio device, inputs included, so the event log also shows
+    /// microphones dropping out.
+    @ObservationIgnored private var allDevices: [AudioOutputDevice] = []
 
     init() {
         refresh()
@@ -37,10 +40,34 @@ final class AudioDeviceMonitor {
     }
 
     func refresh() {
-        let devices = Self.allOutputDevices()
+        let everything = Self.devices(outputsOnly: false)
+        if everything != allDevices {
+            Self.recordChanges(from: allDevices, to: everything)
+            allDevices = everything
+        }
+        let devices = Self.devices(outputsOnly: true)
         if devices != outputs {
             outputs = devices
             onChange?()
+        }
+    }
+
+    private static func recordChanges(from old: [AudioOutputDevice], to new: [AudioOutputDevice]) {
+        // Skip the first listing at launch.
+        guard !old.isEmpty else { return }
+        let oldByUID = Dictionary(old.map { ($0.uid, $0) }, uniquingKeysWith: { first, _ in first })
+        let newByUID = Dictionary(new.map { ($0.uid, $0) }, uniquingKeysWith: { first, _ in first })
+        for device in old where newByUID[device.uid] == nil {
+            EventLog.shared.record("Audio device disappeared: \(device.name) (id \(device.id))")
+        }
+        for device in new {
+            if let previous = oldByUID[device.uid] {
+                if previous.id != device.id {
+                    EventLog.shared.record("Audio device re-added by macOS: \(device.name) (id \(previous.id) → \(device.id))")
+                }
+            } else {
+                EventLog.shared.record("Audio device appeared: \(device.name) (id \(device.id))")
+            }
         }
     }
 
@@ -72,7 +99,7 @@ final class AudioDeviceMonitor {
         AudioObjectPropertyAddress(mSelector: selector, mScope: scope, mElement: kAudioObjectPropertyElementMain)
     }
 
-    private static func allOutputDevices() -> [AudioOutputDevice] {
+    private static func devices(outputsOnly: Bool) -> [AudioOutputDevice] {
         var address = address(kAudioHardwarePropertyDevices)
         var size: UInt32 = 0
         let system = AudioObjectID(kAudioObjectSystemObject)
@@ -81,7 +108,7 @@ final class AudioDeviceMonitor {
         guard AudioObjectGetPropertyData(system, &address, 0, nil, &size, &ids) == noErr else { return [] }
 
         return ids.compactMap { id in
-            guard outputChannelCount(id) > 0,
+            guard !outputsOnly || outputChannelCount(id) > 0,
                   let uid = stringProperty(id, kAudioDevicePropertyDeviceUID),
                   let name = stringProperty(id, kAudioObjectPropertyName)
             else { return nil }
